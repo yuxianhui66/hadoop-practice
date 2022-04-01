@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <!--属性定义-->
+    <property name="LOG_NAME" value="hadoop-practice"/>
+    <property name="LOG_KEEP_DAY" value="10"/>
+    <property name="LOGSTASH_DESTINATION" value="/data/apps/hadoop-practice/hadoop-practice.log"/>
+    <property name="APPNAME" value="hadoop-practice"/>
+
+    <!--控制台输出-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%X{requestId}] %logger{50}:%line - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--文件输出-->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">　　　　　　　　　　　　
+        <file>${LOG_NAME}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">　　　　　　　　　　　　
+            <fileNamePattern>${LOG_NAME}-%d{yyyy-MM-dd}.zip</fileNamePattern>　　　　　　　　　　　　　
+            <maxHistory>${LOG_KEEP_DAY}</maxHistory>　　　　　　　　　　　
+        </rollingPolicy>
+        　　　　　ta
+        <encoder>　　　　　　　　　　　
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%level][%X{requestId}] %logger{50}:%line - %msg%n</pattern>
+            　　　　　　　　　　　
+        </encoder>
+        　　
+    </appender>
+    <!-- 增加收集数据统计配置-->
+    <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_DESTINATION}</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"appname":"${APPNAME}"}</customFields>
+        </encoder>
+    </appender>
+
+    <!--主日志级别-->
+    <root level="${log.level}">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="logstash"/>
+    </root>
+    <!--包日志级别-->
+    <logger name="com.ibatis" level="debug"/>
+    <logger name="java.sql" level="debug"/>
+    <logger name="org.springframework.kafka.listener.KafkaMessageListenerContainer" level="OFF"/>
+    <logger name="org.apache.kafka.clients.consumer.internals.AbstractCoordinator" level="OFF"/>
+    <logger name="org.apache.kafka.clients.consumer.internals.ConsumerCoordinator" level="OFF"/>
+
+</configuration>
